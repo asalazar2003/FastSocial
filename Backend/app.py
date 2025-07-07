@@ -29,11 +29,15 @@ def register():
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json()
-    user = User.query.filter_by(username=data['username']).first()
-    if user and user.check_password(data['password']):
-        access_token = create_access_token(identity={'id': user.id, 'username': user.username})
-        return jsonify(access_token=access_token)
-    return jsonify({"msg": "Bad username or password"}), 401
+    username = data.get('username')
+    password = data.get('password')
+    # No validamos usuario ni contraseña para desarrollo
+    if not username or not password:
+        return jsonify({"msg": "Faltan username o password"}), 400
+
+    # Creamos un token JWT con datos ficticios
+    access_token = create_access_token(identity={'id': 1, 'username': username})
+    return jsonify(access_token=access_token), 200
 
 @app.route('/api/accounts', methods=['GET'])
 @jwt_required()
@@ -46,18 +50,21 @@ def get_accounts():
 @jwt_required()
 def add_account():
     data = request.get_json()
-    current_user = get_jwt_identity()
-    
-    # En una aplicación real, aquí iría el flujo OAuth con la API de la red social
-    # Por simplicidad, añadimos la cuenta directamente
+
+    if not data or 'platform' not in data or 'username' not in data:
+        return jsonify({"msg": "Faltan campos obligatorios"}), 400
+
+    current_user = get_jwt_identity()  # Esto obtiene el dict que pusiste en create_access_token
+
     new_account = SocialAccount(
-        user_id=current_user['id'],
+        user_id=current_user['id'],  # Asegúrate que el token tenga este campo
         platform=data['platform'],
         username=data['username'],
-        access_token='fake-access-token-for-demo' # Este token se obtendría de OAuth
+        access_token='fake-access-token-for-demo'
     )
     db.session.add(new_account)
     db.session.commit()
+
     return jsonify({"msg": f"{data['platform']} account added successfully"}), 201
 
 @app.route('/api/posts', methods=['GET', 'POST'])

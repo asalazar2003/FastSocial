@@ -22,6 +22,7 @@ function Login() {
             } else {
                 setIsLogin(true);
                 setError('Registro exitoso! Por favor, inicia sesión.');
+                navigate('/dashboard');
             }
         } catch (err) {
             setError(err.response?.data?.msg || 'Ocurrió un error.');
@@ -41,12 +42,6 @@ function Login() {
                 </form>
                 <button onClick={() => setIsLogin(!isLogin)} className="toggle-auth">
                     {isLogin ? '¿No tienes cuenta? Regístrate' : '¿Ya tienes cuenta? Inicia sesión'}
-                </button>
-                <button type="button" onClick={() => {
-                    localStorage.setItem('token', 'fake-token');
-                    navigate('/dashboard');
-                }}>
-                    Entrar sin login (modo desarrollo)
                 </button>
             </div>
         </div>
