@@ -29,4 +29,8 @@ npm start
 
 ### Backend
 
-Aun no funciona.
+```bash
+cd Backend
+python app.py
+```
+Aunque actualmente no funcionara, ya que requiere tener acceso local a la base de datos en mi computador.
